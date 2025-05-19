@@ -8,24 +8,8 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Configure CORS with specific options
-const corsOptions = {
-  origin: [
-    'https://ai-prompt-frontend.vercel.app',
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000',
-    'https://ai-prompt-tester.vercel.app',  // Add any additional domains your frontend might be hosted on
-    'http://localhost:8080'  // Common local development server
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,  // Allow cookies if needed
-  maxAge: 86400  // Cache preflight requests for 1 day (in seconds)
-};
-
 // Middleware
-app.use(cors(corsOptions)); // Enable CORS with specific configuration
+app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json());
 
 // MongoDB Connection (optional - if you want to store prompts/results)
@@ -218,23 +202,9 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
-// Health check endpoint with CORS debugging info
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  // Log the origin of the request for debugging
-  console.log('Health check request from origin:', req.headers.origin);
-  console.log('All request headers:', req.headers);
-  
-  // Add explicit CORS headers for this endpoint
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept');
-  
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    corsEnabled: true,
-    requestOrigin: req.headers.origin || 'not provided' 
-  });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Start server
